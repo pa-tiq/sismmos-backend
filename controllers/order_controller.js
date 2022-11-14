@@ -2,25 +2,21 @@ const fs = require('fs');
 const path = require('path');
 const { validationResult } = require('express-validator');
 
-const Post = require('../models/post');
+const Order = require('../models/order');
 const User = require('../models/user');
 
-exports.getPosts = (req, res, next) => {
-  const currentPage = req.query.page || 1;
-  const perPage = 2;
+exports.getOrders = (req, res, next) => {
   let totalItems;
-  Post.find()
+  Order.find()
     .countDocuments()
     .then((count) => {
       totalItems = count;
-      return Post.find()
-        .skip((currentPage - 1) * perPage)
-        .limit(perPage);
+      return Order.find()
     })
-    .then((posts) => {
+    .then((orders) => {
       res
         .status(200)
-        .json({ message: 'Posts fetched', posts: posts, totalItems: totalItems }); // 200 = success
+        .json({ message: 'Orders fetched', orders: orders, totalItems: totalItems }); // 200 = success
     })
     .catch((error) => {
       if (!error.statusCode) {
@@ -30,16 +26,16 @@ exports.getPosts = (req, res, next) => {
     });
 };
 
-exports.getPost = (req, res, next) => {
+exports.getOrder = (req, res, next) => {
   const postId = req.params.postId;
   Post.findById(postId)
     .then((post) => {
       if (!post) {
-        const error = new Error('Could not find post');
+        const error = new Error('Could not find order');
         error.statusCode = 404;
         throw error;
       }
-      res.status(200).json({ message: 'Post fetched', post: post });
+      res.status(200).json({ message: 'Order fetched', post: post });
     })
     .catch((error) => {
       if (!error.statusCode) {
@@ -49,46 +45,56 @@ exports.getPost = (req, res, next) => {
     });
 };
 
-exports.createPost = (req, res, next) => {
+exports.createOrder = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new Error('Validation failed, entered data is incorrect');
     error.statusCode = 422;
     throw error;
   }
-  if (!req.file) {
-    const error = new Error('No image provided');
-    error.statusCode = 422;
-    throw error;
-  }
+  //if (!req.file) {
+  //  const error = new Error('No image provided');
+  //  error.statusCode = 422;
+  //  throw error;
+  //}
   //const imageUrl = req.file.path; //doesn't work in windows
-  const imageUrl = req.file.path.replace('\\', '/');
-  const title = req.body.title;
-  const content = req.body.content;
+  //const imageUrl = req.file.path.replace('\\', '/');
+  const material = req.body.material;
+  const requerente = req.body.requerente;
+  const prioridade = req.body.prioridade;
+  const tipo = req.body.tipo;
+  const status = req.body.status;
+  const ultima_atualizacao = req.body.ultima_atualizacao;
+  const log = req.body.log;
   let creator;
 
-  const post = new Post({
-    title: title,
-    content: content,
-    imageUrl: imageUrl,
-    creator: req.userId,
+  const order = new Order({
+    material: material,
+    requerente: requerente,
+    prioridade: prioridade,
+    tipo: tipo,
+    status: status,
+    ultima_atualizacao: ultima_atualizacao,
+    log: log,
+ //   criador: req.userId,
   });
-  post
+
+  order
     .save()
-    .then((result) => {
-      return User.findById(req.userId);
-    })
-    .then((user) => {
-      creator = user;
-      user.posts.push(post);
-      return user.save();
-    })
+    //.then((result) => {
+    //  return User.findById(req.userId);
+    //})
+    //.then((user) => {
+    //  creator = user;
+    //  user.orders.push(order);
+    //  return user.save();
+    //})
     .then((result) => {
       // 201 = success, a resource was created
       res.status(201).json({
-        message: 'Post created successfully',
-        post: post,
-        creator: { _id: creator._id, name: creator.name },
+        message: 'Order created successfully',
+        order: order,
+        //criador: { _id: creator._id, name: creator.name },
       });
     })
     .catch((error) => {
@@ -97,10 +103,9 @@ exports.createPost = (req, res, next) => {
       }
       next(error);
     });
-  console.log(title, content);
 };
 
-exports.updatePost = (req, res, next) => {
+exports.updateOrder = (req, res, next) => {
   const postId = req.params.postId;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -123,7 +128,7 @@ exports.updatePost = (req, res, next) => {
   Post.findById(postId)
     .then((post) => {
       if (!post) {
-        const error = new Error('Could not find post');
+        const error = new Error('Could not find order');
         error.statusCode = 404;
         throw error;
       }
@@ -142,7 +147,7 @@ exports.updatePost = (req, res, next) => {
       return post.save();
     })
     .then((result) => {
-      res.status(200).json({ message: 'Post updated', post: result });
+      res.status(200).json({ message: 'Order updated', post: result });
     })
     .catch((error) => {
       if (!error.statusCode) {
@@ -152,12 +157,12 @@ exports.updatePost = (req, res, next) => {
     });
 };
 
-exports.deletePost = (req, res, next) => {
+exports.deleteOrder = (req, res, next) => {
   const postId = req.params.postId;
   Post.findById(postId)
     .then((post) => {
       if (!post) {
-        const error = new Error('Could not find post');
+        const error = new Error('Could not find order');
         error.statusCode = 404;
         throw error;
       }
@@ -178,7 +183,7 @@ exports.deletePost = (req, res, next) => {
       return user.save();
     })
     .then((result) => {
-      res.status(200).json({ message: 'Post deleted' });
+      res.status(200).json({ message: 'Order deleted' });
     })
     .catch((error) => {
       if (!error.statusCode) {

@@ -5,7 +5,7 @@ const mongoConnect = require("./util/database");
 const multer = require("multer");
 const { v4:uuidv4 } = require('uuid');
 
-const feedRoutes = require("./routes/feed_router");
+const orderRoutes = require("./routes/order_router");
 const authRoutes = require("./routes/auth_router");
 
 const app = express();
@@ -51,7 +51,7 @@ app.use((req, res, next) => {
   next(); //the request can now continue
 });
 
-app.use("/feed", feedRoutes); // GET /feed/
+app.use("/orders", orderRoutes); // GET /orders/
 app.use("/auth", authRoutes); // GET /auth/
 
 app.use((error, req, res, next) => {
