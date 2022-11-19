@@ -31,15 +31,6 @@ const fileFilter = (req, file, callback) => {
   }
 };
 
-app.use(bodyParser.json()); // parse incoming JSON data
-
-app.use(
-  multer({ storage: fileStorage, fileFilter: fileFilter }).single("image") 
-  //extract a single file in a field named 'image' in the request
-); //every incoming request will be parsed for files
-
-app.use("/images", express.static(path.join(__dirname, "images")));
-
 app.use((req, res, next) => {
   //middleware to solve CORS error
   res.setHeader("Access-Control-Allow-Origin", "*"); //allow origins to access my data
@@ -50,6 +41,15 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Headers", "Content-type, Authorization"); //allow origins to use these two headers
   next(); //the request can now continue
 });
+
+app.use(bodyParser.json()); // parse incoming JSON data
+
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single("image") 
+  //extract a single file in a field named 'image' in the request
+); //every incoming request will be parsed for files
+
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use("/orders", orderRoutes); // GET /orders/
 app.use("/auth", authRoutes); // GET /auth/

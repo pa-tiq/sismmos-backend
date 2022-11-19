@@ -22,14 +22,12 @@ router.put(
       })
       .normalizeEmail(),
     body('password').trim().isLength({ min: 5 }),
-    body('password').trim().not().isEmpty(),
+    body('name').trim().not().isEmpty(),
   ],
   authController.signup
 );
 
 router.post('/login', authController.login);
-
-router.get('/status', isAuth, authController.getUserStatus);
 
 router.patch(
   '/status',

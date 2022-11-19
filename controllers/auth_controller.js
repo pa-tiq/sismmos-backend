@@ -6,6 +6,7 @@ const keys = require('../keys.json');
 const User = require('../models/user');
 
 exports.signup = (req, res, next) => {
+  console.log('corpo da requisição: ',req.body);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new Error('Validation failed');
