@@ -106,8 +106,6 @@ exports.createOrder = (req, res, next) => {
 };
 
 exports.updateOrder = (req, res, next) => {
-  console.log(req.params);
-  console.log(req.body);
   const orderId = req.params.orderId;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -169,28 +167,28 @@ exports.updateOrder = (req, res, next) => {
 };
 
 exports.deleteOrder = (req, res, next) => {
-  const postId = req.params.postId;
-  Post.findById(postId)
-    .then((post) => {
-      if (!post) {
+  const orderId = req.params.orderId;
+  Order.findById(orderId)
+    .then((order) => {
+      if (!order) {
         const error = new Error('Could not find order');
         error.statusCode = 404;
         throw error;
       }
-      if (post.creator.toString() !== req.userId) {
-        const error = new Error('Not authorized');
-        error.statusCode = 403;
-        throw error;
-      }
-      // check logged in user
-      deleteImage(post.imageUrl);
-      return Post.findByIdAndRemove(postId);
+      //if (order.creator.toString() !== req.userId) {
+      //  const error = new Error('Not authorized');
+      //  error.statusCode = 403;
+      //  throw error;
+      //}
+      //// check logged in user
+      //deleteImage(post.imageUrl);
+      return Order.findByIdAndRemove(orderId);
     })
     .then((result) => {
       return User.findById(req.userId);
     })
     .then((user) => {
-      user.posts.pull(postId);
+      user.orders.pull(orderId);
       return user.save();
     })
     .then((result) => {
