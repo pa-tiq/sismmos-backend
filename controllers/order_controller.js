@@ -76,25 +76,25 @@ exports.createOrder = (req, res, next) => {
     status: status,
     ultima_atualizacao: ultima_atualizacao,
     log: log,
- //   criador: req.userId,
+    criador: req.userId,
   });
 
   order
     .save()
-    //.then((result) => {
-    //  return User.findById(req.userId);
-    //})
-    //.then((user) => {
-    //  creator = user;
-    //  user.orders.push(order);
-    //  return user.save();
-    //})
+    .then((result) => {
+      return User.findById(req.userId);
+    })
+    .then((user) => {
+      creator = user;
+      user.orders.push(order);
+      return user.save();
+    })
     .then((result) => {
       // 201 = success, a resource was created
       res.status(201).json({
         message: 'Order created successfully',
         order: order,
-        //criador: { _id: creator._id, name: creator.name },
+        criador: { _id: creator._id, name: creator.name, email: creator.email },
       });
     })
     .catch((error) => {
@@ -106,48 +106,59 @@ exports.createOrder = (req, res, next) => {
 };
 
 exports.updateOrder = (req, res, next) => {
-  const postId = req.params.postId;
+  console.log(req.params);
+  console.log(req.body);
+  const orderId = req.params.orderId;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    console.log(errors);
     const error = new Error('Validation failed, entered data is incorrect');
     error.statusCode = 422;
     throw error;
   }
-  const title = req.body.title;
-  const content = req.body.content;
-  let imageUrl = req.body.image; // no new image was picked
-  if (req.file) {
-    // user picked a new image
-    imageUrl = req.file.path.replace('\\', '/');
-  }
-  if (!imageUrl) {
-    const error = new Error('No image provided');
-    error.statusCode = 422;
-    throw error;
-  }
-  Post.findById(postId)
-    .then((post) => {
-      if (!post) {
+  const material = req.body.material;
+  const requerente = req.body.requerente;
+  const prioridade = req.body.prioridade;
+  const tipo = req.body.tipo;
+  const status = req.body.status;
+  const log = req.body.log;
+  //let imageUrl = req.body.image; // no new image was picked
+  //if (req.file) {
+  //  // user picked a new image
+  //  imageUrl = req.file.path.replace('\\', '/');
+  //}
+  //if (!imageUrl) {
+  //  const error = new Error('No image provided');
+  //  error.statusCode = 422;
+  //  throw error;
+  //}
+  Order.findById(orderId)
+    .then((order) => {
+      if (!order) {
         const error = new Error('Could not find order');
         error.statusCode = 404;
         throw error;
       }
-      if (post.creator.toString() !== req.userId) {
-        const error = new Error('Not authorized');
-        error.statusCode = 403;
-        throw error;
-      }
-      if (imageUrl !== post.imageUrl) {
-        // new image was uploaded
-        deleteImage(post.imageUrl);
-      }
-      post.title = title;
-      post.imageUrl = imageUrl;
-      post.content = content;
-      return post.save();
+      //if (order.criador.toString() !== req.userId) {
+      //  const error = new Error('Not authorized');
+      //  error.statusCode = 403;
+      //  throw error;
+      //}
+      //if (imageUrl !== post.imageUrl) {
+      //  // new image was uploaded
+      //  deleteImage(post.imageUrl);
+      //}
+      order.material = material;
+      order.requerente = requerente;
+      order.prioridade = prioridade;
+      order.tipo = tipo;
+      order.status = status;
+      order.log = log;
+      //post.imageUrl = imageUrl;
+      return order.save();
     })
     .then((result) => {
-      res.status(200).json({ message: 'Order updated', post: result });
+      res.status(200).json({ message: 'Order updated', order: result });
     })
     .catch((error) => {
       if (!error.statusCode) {

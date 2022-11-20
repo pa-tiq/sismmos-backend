@@ -6,7 +6,7 @@ const keys = require('../keys.json');
 const User = require('../models/user');
 
 exports.signup = (req, res, next) => {
-  console.log('corpo da requisição: ',req.body);
+  console.log('corpo da requisição: ', req.body);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new Error('Validation failed');
@@ -68,6 +68,8 @@ exports.login = (req, res, next) => {
       );
       res.status(200).json({
         token: token,
+        name: loadedUser.name,
+        email: loadedUser.email,
         userId: loadedUser._id.toString(),
       });
     })
@@ -79,7 +81,7 @@ exports.login = (req, res, next) => {
     });
 };
 
-exports.getUserStatus = (req, res, next) => {
+exports.getUserData = (req, res, next) => {
   User.findById(req.userId)
     .then((user) => {
       if (!user) {
@@ -87,7 +89,7 @@ exports.getUserStatus = (req, res, next) => {
         error.statusCode = 404;
         throw error;
       }
-      return res.status(200).json({ status: user.status });
+      return res.status(200).json({ name: user.name, email: user.email });
     })
     .catch((error) => {
       if (!error.statusCode) {
