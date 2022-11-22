@@ -6,6 +6,7 @@ const multer = require("multer");
 const { v4:uuidv4 } = require('uuid');
 
 const orderRoutes = require("./routes/order_router");
+const constraintRoutes = require("./routes/constraint_router.js");
 const authRoutes = require("./routes/auth_router");
 
 const app = express();
@@ -52,6 +53,7 @@ app.use(
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use("/orders", orderRoutes); // GET /orders/
+app.use("/constraints", constraintRoutes); // GET /constraints/
 app.use("/auth", authRoutes); // GET /auth/
 
 app.use((error, req, res, next) => {
