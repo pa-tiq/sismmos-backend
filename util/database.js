@@ -15,3 +15,5 @@ const mongoConnect = (callback) => {
 };
 
 module.exports = mongoConnect;
+
+// se não conseguir conectar ao mongo, acesse isso: https://cloud.mongodb.com/v2/636e8dccdaec41321e50d6a9#/security/network/accessList e coloque seu IP na lista

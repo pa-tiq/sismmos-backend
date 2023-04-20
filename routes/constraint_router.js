@@ -6,14 +6,15 @@ const isAuth = require('../util/is-auth');
 
 const router = express.Router();
 
-router.get('',isAuth, constraintController.getConstraints); // GET /constraints
+router.get('', isAuth, constraintController.getConstraints); // GET /constraints
 
-router.put('',
+router.put(
+  '',
   isAuth,
   [body('ultima_atualizacao').not().isEmpty(), body('log').not().isEmpty()],
   constraintController.createConstraints
 ); // PUT /constraints
 
-router.patch('',isAuth, constraintController.updateConstraints);
+router.patch('/:constraintId', isAuth, constraintController.updateConstraints);
 
 module.exports = router;

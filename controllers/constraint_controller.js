@@ -60,6 +60,7 @@ exports.createConstraints = (req, res, next) => {
 };
 
 exports.updateConstraints = (req, res, next) => {
+  const constraintid = req.params.constraintId;
   const requerente = req.body.requerente;
   const prioridade = req.body.prioridade;
   const tipo = req.body.tipo;
@@ -67,22 +68,24 @@ exports.updateConstraints = (req, res, next) => {
   const ultima_atualizacao = req.body.ultima_atualizacao;
   const log = req.body.log;
 
-  const constraint = new Constraint({
-    requerente: requerente,
-    prioridade: prioridade,
-    tipo: tipo,
-    status: status,
-    ultima_atualizacao: ultima_atualizacao,
-    log: log,
-  });
+  Constraint.findById(constraintid)
+    .then((constr) => {
+      if (!constr) {
+        const error = new Error('Could not find constraints');
+        error.statusCode = 404;
+        throw error;
+      }
 
-  constraint
-    .save()
+      constr.requerente = requerente;
+      constr.prioridade = prioridade;
+      constr.tipo = tipo;
+      constr.status = status;
+      constr.log = log;
+      constr.ultima_atualizacao = ultima_atualizacao;
+      return constr.save();
+    })
     .then((result) => {
-      res.status(201).json({
-        message: 'Constraints updated successfully',
-        constraint: constraint,
-      });
+      res.status(200).json({ message: 'Constraints updated', order: result });
     })
     .catch((error) => {
       if (!error.statusCode) {
@@ -90,4 +93,28 @@ exports.updateConstraints = (req, res, next) => {
       }
       next(error);
     });
+
+  // const constraint = new Constraint({
+  //   requerente: requerente,
+  //   prioridade: prioridade,
+  //   tipo: tipo,
+  //   status: status,
+  //   ultima_atualizacao: ultima_atualizacao,
+  //   log: log,
+  // });
+
+  // constraint
+  //   .save()
+  //   .then((result) => {
+  //     res.status(201).json({
+  //       message: 'Constraints updated successfully',
+  //       constraint: constraint,
+  //     });
+  //   })
+  //   .catch((error) => {
+  //     if (!error.statusCode) {
+  //       error.statusCode = 500;
+  //     }
+  //     next(error);
+  //   });
 };

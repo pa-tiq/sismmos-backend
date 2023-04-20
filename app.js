@@ -1,19 +1,19 @@
-const path = require("path");
-const express = require("express");
-const bodyParser = require("body-parser");
-const mongoConnect = require("./util/database");
-const multer = require("multer");
-const { v4:uuidv4 } = require('uuid');
+const path = require('path');
+const express = require('express');
+const bodyParser = require('body-parser');
+const mongoConnect = require('./util/database');
+const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
 
-const orderRoutes = require("./routes/order_router");
-const constraintRoutes = require("./routes/constraint_router.js");
-const authRoutes = require("./routes/auth_router");
+const orderRoutes = require('./routes/order_router');
+const constraintRoutes = require('./routes/constraint_router.js');
+const authRoutes = require('./routes/auth_router');
 
 const app = express();
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, "images");
+    callback(null, 'images');
   },
   filename: (req, file, callback) => {
     //callback(null, new Date().toISOString() + "-" + file.originalname); //doesn't work in windows
@@ -22,9 +22,9 @@ const fileStorage = multer.diskStorage({
 });
 const fileFilter = (req, file, callback) => {
   if (
-    file.mimetype === "image/png" ||
-    file.mimetype === "image/jpg" ||
-    file.mimetype === "image/jpeg"
+    file.mimetype === 'image/png' ||
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/jpeg'
   ) {
     callback(null, true); //valid file
   } else {
@@ -34,27 +34,27 @@ const fileFilter = (req, file, callback) => {
 
 app.use((req, res, next) => {
   //middleware to solve CORS error
-  res.setHeader("Access-Control-Allow-Origin", "*"); //allow origins to access my data
+  res.setHeader('Access-Control-Allow-Origin', '*'); //allow origins to access my data
   res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, PATCH, DELETE"
+    'Access-Control-Allow-Methods',
+    'GET, POST, PUT, PATCH, DELETE'
   ); //allow origins to use my HTTP methods
-  res.setHeader("Access-Control-Allow-Headers", "Content-type, Authorization"); //allow origins to use these two headers
+  res.setHeader('Access-Control-Allow-Headers', 'Content-type, Authorization'); //allow origins to use these two headers
   next(); //the request can now continue
 });
 
 app.use(bodyParser.json()); // parse incoming JSON data
 
 app.use(
-  multer({ storage: fileStorage, fileFilter: fileFilter }).single("image") 
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')
   //extract a single file in a field named 'image' in the request
 ); //every incoming request will be parsed for files
 
-app.use("/images", express.static(path.join(__dirname, "images")));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
-app.use("/orders", orderRoutes); // GET /orders/
-app.use("/constraints", constraintRoutes); // GET /constraints/
-app.use("/auth", authRoutes); // GET /auth/
+app.use('/orders', orderRoutes); // GET /orders/
+app.use('/constraints', constraintRoutes); // GET /constraints/
+app.use('/auth', authRoutes); // GET /auth/
 
 app.use((error, req, res, next) => {
   // executed whenever an error is thrown with throw() or forwarded with next()
